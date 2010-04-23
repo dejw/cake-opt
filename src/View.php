@@ -18,82 +18,82 @@ try {
 /*
  * View class for Open Power Template library
  * @author: Dawdid Fatyga
- */
+*/
 
 class Opc_View extends Object {
 
     /* Name of the controller. */
-	var $controller = null;
+    var $controller = null;
 
     /* Action to be performed. */
-	var $action = null;
+    var $action = null;
 
     /* Array of parameter data */
-	var $params = array();
+    var $params = array();
 
     /* Current passed params */
-	var $passedArgs = array();
+    var $passedArgs = array();
 
     /* Array of data */
-	var $data = array();
+    var $data = array();
 
     /* Variables for the view */
-	var $viewVars = array();
+    var $viewVars = array();
 
     /* Name of layout to use with this View. */
-	var $layout = 'default';
+    var $layout = 'default';
 
     /* Title HTML element of this View. */
-	var $pageTitle = false;
+    var $pageTitle = false;
 
     /* Turns on or off Cake's conventional mode of rendering views. On by default. */
-	var $autoRender = true;
+    var $autoRender = true;
 
     /* Turns on or off Cake's conventional mode of finding layout files. On by default. */
-	var $autoLayout = true;
+    var $autoLayout = true;
 
     /* File extension. Defaults to Cake's template ".tpl". */
-	var $ext = '.tpl';
+    var $ext = '.tpl';
 
     /* Sub-directory for this view file. */
-	var $subDir = null;
+    var $subDir = null;
 
     /* True when the view has been rendered. */
-	var $hasRendered = false;
+    var $hasRendered = false;
 
     /* Holds View output. */
-	var $output = false;
+    var $output = false;
 
     /* List of variables to collect from the associated controller */
-	var $__passedVars = array(
-		'viewVars', 'action', 'autoLayout', 'autoRender', 
-        'here', 'layout', 'name', 'pageTitle', 
-		'params', 'data', 'passedArgs',
-	);
+    var $__passedVars = array(
+            'viewVars', 'action', 'autoLayout', 'autoRender',
+            'here', 'layout', 'name', 'pageTitle',
+            'params', 'data', 'passedArgs',
+    );
 
     /* This Output class simply returns template */
     var $renderer = null;
 
     /* Standard view configuration */
-	function __construct(&$controller, $register = true){
-		if (is_object($controller)) {
+    function __construct(&$controller, $register = true) {
+        if (is_object($controller)) {
             foreach($this->__passedVars as $var)
-				$this->{$var} = $controller->{$var};
+                $this->{$var} = $controller->{$var};
 
             /* Controller name is specific */
             $this->controller = $this->name;
-		}
+        }
 
-		parent::__construct();
+        parent::__construct();
 
-		if ($register) ClassRegistry::addObject('view', $this);
+        if ($register) ClassRegistry::addObject('view', $this);
         $this->renderer = new Opt_Output_Return();
-	}
+    }
 
     /* Renders the single action */
-	function render($action = null, $layout = null, $file = null) {
-		if ($this->hasRendered) return true;
-		if ($file != null) $action = $file;
+    function render($action = null, $layout = null, $file = null) {
+        if ($this->hasRendered) return true;
+        if ($file != null) $action = $file;
         if (is_null($action)) $action = $this->action;
         if ($layout === null) $layout = $this->layout;
 
@@ -103,7 +103,7 @@ class Opc_View extends Object {
             /* Create a view object for action */
             $view = new Opt_View($viewFileName);
             $this->_exportContext($view);
-        
+
             if ($layout && $this->autoLayout) {
                 $this->output = $this->renderLayout($view, $layout);
             } else {
@@ -115,7 +115,7 @@ class Opc_View extends Object {
         } else {
             throw new Opt_TemplateNotFound_Exception;
         }
-	}
+    }
 
     /*
      * Render the layout
@@ -123,9 +123,9 @@ class Opc_View extends Object {
      * To embed content of a view write:
      *
      *      <opt:include view="$content" />
-     */
-	function renderLayout($content, $layout = null) {
-		$layoutFileName = $this->_getLayoutFileName($layout);
+    */
+    function renderLayout($content, $layout = null) {
+        $layoutFileName = $this->_getLayoutFileName($layout);
 
         /* Create view object for layout */
         $layout = new Opt_View($layoutFileName);
@@ -134,24 +134,24 @@ class Opc_View extends Object {
 
         /* Render the layout */
         return $this->renderer->render($layout);
-	}
+    }
 
     /* Returns file name for view */
-	function _getViewFileName($name = null) {
+    function _getViewFileName($name = null) {
         return $this->_getFileName($name, $this->action);
-	}
+    }
 
     /* Returns file name for layout */
-	function _getLayoutFileName($name = null) {
+    function _getLayoutFileName($name = null) {
         return $this->_getFileName($name, $this->layout, 'layouts');
-	}
+    }
 
     /* Creates filename for view or layout */
-    function _getFileName($name, $default, $directory = null){
+    function _getFileName($name, $default, $directory = null) {
 
         /* Set subdir if available */
         $subDir = null;
-		if (!is_null($this->subDir)) $subDir = $this->subDir . DS;
+        if (!is_null($this->subDir)) $subDir = $this->subDir . DS;
 
         /* Fallback to default name */
         if ($name === null) $name = $default;
@@ -159,10 +159,10 @@ class Opc_View extends Object {
 
         /* Inflect the filename */
         if (strpos($name, DS) === false && $name[0] !== '.') {
-			$name = $subDir . Inflector::underscore($name);
-		} elseif (strpos($name, DS) !== false) {
+            $name = $subDir . Inflector::underscore($name);
+        } elseif (strpos($name, DS) !== false) {
             $name = $subDir . $name;
-    	}
+        }
 
         /* Prepend directory */
         if(!is_null($directory)) $subDir = $directory . DS . $subDir;
@@ -174,8 +174,8 @@ class Opc_View extends Object {
     }
 
     /* Sets variables to the given view */
-    function _exportContext($view){
-        foreach($this->viewVars as $var => $value){
+    function _exportContext($view) {
+        foreach($this->viewVars as $var => $value) {
             $view->{$var} = $value;
         }
     }
