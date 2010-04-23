@@ -11,7 +11,7 @@ try {
     if(Configure::read() > 0)
         $tpl->compileMode = Opt_Class::CM_REBUILD;
     
-    $tpl->register(Opt_Class::OPT_INSTRUCTION, 'LinkTo', 'Opc_Instruction_LinkTo');
+    $tpl->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
 
     $tpl->setup();
 } catch(Opt_Exception $exception) {
