@@ -14,7 +14,6 @@ class Opc_Instruction_LinkTo extends Opt_Compiler_Processor {
     
     /*
      * Renders the anchor
-     * TODO: fix parameters escaping
      */
     public function processNode(Opt_Xml_Node $node){
         /* Parse attributes */
@@ -61,16 +60,17 @@ class Opc_Instruction_LinkTo extends Opt_Compiler_Processor {
         } else {
             $node->set('dynamic', true);
             /* otherwise emit the url generator */
-            $href = "<?php echo h(Router::url(array(" .
-                    'controller => "' . $url['controller']. '",' .
-                    'action => "' . $url['action']. '",';
+            $href = "echo h(Router::url(array(" .
+                    '"controller" => "' . $url['controller']. '",' .
+                    '"action" => "' . $url['action']. '",';
             foreach($params as $param)
                 $href .= $param . ",";
 
-            $href .= "), " . ($optional['full'] ? "true" : "false") . ")); ?>";
+            $href .= "), " . ($optional['full'] ? "true" : "false") . "))";
             
             $node->addBefore(Opt_Xml_Buffer::TAG_NAME, "echo 'a';");
-            $attr = new Opt_Xml_Attribute('href', $href);
+            $attr = new Opt_Xml_Attribute('href', null);
+            $attr->addAfter(Opt_Xml_Buffer::ATTRIBUTE_VALUE, $href);
             $node->addAttribute($attr);
         }
         $node->set('postprocess', true);
