@@ -6,25 +6,11 @@
  */
 
 class Opc_View extends View {
-
-    static public $tpl;
     
 	function __construct(&$controller, $register = true){
 		parent::__construct($controller, $register);
 
 		$this->ext = ".tpl";
-        if(self::$tpl === null){
-            try {
-                self::$tpl = new Opt_Class;
-                self::$tpl->sourceDir = ROOT . DS . APP_DIR .  '/views/';
-                self::$tpl->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
-                self::$tpl->contentType = Opt_Output_Http::HTML;
-                self::$tpl->charset = 'utf-8';
-                self::$tpl->setup();
-            } catch(Opt_Exception $exception) {
-                Opt_Error_Handler($exception);
-            }
-        }
 	}
 
 	function render($action = null, $layout = null, $file = null) {
@@ -113,8 +99,20 @@ class Opc_View extends View {
 
         return $name;
 	}
-
 }
 
+try {
+    $tpl = new Opt_Class;
+    $tpl->sourceDir = ROOT . DS . APP_DIR .  '/views/';
+    $tpl->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
+    $tpl->contentType = Opt_Output_Http::HTML;
+    $tpl->charset = 'utf-8';
+
+    $tpl->register(Opt_Class::OPT_INSTRUCTION, 'LinkTo', 'Opc_Instruction_LinkTo');
+
+    $tpl->setup();
+} catch(Opt_Exception $exception) {
+    Opt_Error_Handler($exception);
+}
 
 ?>
