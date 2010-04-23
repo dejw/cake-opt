@@ -6,7 +6,11 @@ try {
     $tpl->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
     $tpl->contentType = Opt_Output_Http::HTML;
     $tpl->charset = 'utf-8';
-
+    
+    /* Recompile template every request on debug */
+    if(Configure::read() > 0)
+        $tpl->compileMode = Opt_Class::CM_REBUILD;
+    
     $tpl->register(Opt_Class::OPT_INSTRUCTION, 'LinkTo', 'Opc_Instruction_LinkTo');
 
     $tpl->setup();
@@ -40,6 +44,8 @@ class Opc_View extends Object {
     /* Variables for the view */
     var $viewVars = array();
 
+    var $viewPath = null;
+    
     /* Name of layout to use with this View. */
     var $layout = 'default';
 
@@ -67,7 +73,7 @@ class Opc_View extends Object {
     /* List of variables to collect from the associated controller */
     var $__passedVars = array(
             'viewVars', 'action', 'autoLayout', 'autoRender',
-            'here', 'layout', 'name', 'pageTitle',
+            'here', 'layout', 'name', 'pageTitle', 'viewPath',
             'params', 'data', 'passedArgs',
     );
 
@@ -93,22 +99,24 @@ class Opc_View extends Object {
     /* Renders the single action */
     function render($action = null, $layout = null, $file = null) {
         if ($this->hasRendered) return true;
+        
         if ($file != null) $action = $file;
         if (is_null($action)) $action = $this->action;
         if ($layout === null) $layout = $this->layout;
 
         /* Render view with ginven action name */
         if ($action !== false && $viewFileName = $this->_getViewFileName($action)) {
-
+            
             /* Create a view object for action */
             $view = new Opt_View($viewFileName);
             $this->_exportContext($view);
 
-            if ($layout && $this->autoLayout) {
-                $this->output = $this->renderLayout($view, $layout);
-            } else {
-                $this->output = $this->renderer->render($view);
-            }
+            /* Inherit with given the layout */
+            if ($layout && $this->autoLayout)
+                $view->inherit($this->_getLayoutFileName($layout));
+
+            /* Render the view */
+            $this->output = $this->renderer->render($view);
 
             $this->hasRendered = true;
             return $this->output;
@@ -124,12 +132,15 @@ class Opc_View extends Object {
      *
      *      <opt:include view="$content" />
     */
-    function renderLayout($content, $layout = null) {
-        $layoutFileName = $this->_getLayoutFileName($layout);
+    function renderLayout($content, $viewName, $layout = null) {
+        $layoutFileName = 
 
         /* Create view object for layout */
         $layout = new Opt_View($layoutFileName);
         $layout->content = $content;
+        $layout->pageTitle = $this->pageTitle;
+        $layout->viewTemplateName = $viewName;
+        
         $this->_exportContext($layout);
 
         /* Render the layout */
@@ -138,7 +149,7 @@ class Opc_View extends Object {
 
     /* Returns file name for view */
     function _getViewFileName($name = null) {
-        return $this->_getFileName($name, $this->action);
+        return $this->_getFileName($name, $this->action, $this->viewPath);
     }
 
     /* Returns file name for layout */
