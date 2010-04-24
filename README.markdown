@@ -5,7 +5,7 @@ Open Power Cake is a plugin for [CakePHP] web framework, that allows to use [Ope
 ## Requirements ##
 
 1. CakePHP ([download page][CakePHPdownload])
-2. Open Power Template library to work. ([download page][OPTdownload])
+2. Open Power Template library ([download page][OPTdownload])
 
 Make sure to check Open Power Template requirements listed [here][OPTreqs].
 
