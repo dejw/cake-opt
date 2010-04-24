@@ -2,15 +2,20 @@
 
 try {
     $tpl = new Opt_Class;
+
+    /* TODO: make this configurable */
     $tpl->sourceDir = ROOT . DS . APP_DIR .  '/views/';
     $tpl->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
     $tpl->contentType = Opt_Output_Http::HTML;
     $tpl->charset = 'utf-8';
     
     /* Recompile template every request on debug */
-    if(Configure::read() > 0)
+    if(Configure::read() > 0){
         $tpl->compileMode = Opt_Class::CM_REBUILD;
-    
+        Opl_Registry::setState('opl_extended_errors', true);
+    }
+
+    /* TODO: This should be done automatically */
     $tpl->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
 
     $tpl->setup();
@@ -18,6 +23,10 @@ try {
     Opt_Error_Handler($exception);
 }
 
+class Opc_NoActionGiven_Exception extends Opt_API_Exception
+{
+    protected $_message = 'no action was given to rendering process.';
+} // end Opt_TemplateNotFound_Exception;
 
 /*
  * View class for Open Power Template library
@@ -44,6 +53,7 @@ class Opc_View extends Object {
     /* Variables for the view */
     var $viewVars = array();
 
+    /* Path for the view */
     var $viewPath = null;
     
     /* Name of layout to use with this View. */
@@ -51,12 +61,6 @@ class Opc_View extends Object {
 
     /* Title HTML element of this View. */
     var $pageTitle = false;
-
-    /* Turns on or off Cake's conventional mode of rendering views. On by default. */
-    var $autoRender = true;
-
-    /* Turns on or off Cake's conventional mode of finding layout files. On by default. */
-    var $autoLayout = true;
 
     /* File extension. Defaults to Cake's template ".tpl". */
     var $ext = '.tpl';
@@ -98,53 +102,36 @@ class Opc_View extends Object {
 
     /* Renders the single action */
     function render($action = null, $layout = null, $file = null) {
-        if ($this->hasRendered) return true;
-        
-        if ($file != null) $action = $file;
-        if (is_null($action)) $action = $this->action;
-        if ($layout === null) $layout = $this->layout;
+        try {
+            if ($this->hasRendered) return true;
 
-        /* Render view with ginven action name */
-        if ($action !== false && $viewFileName = $this->_getViewFileName($action)) {
-            
-            /* Create a view object for action */
-            $view = new Opt_View($viewFileName);
-            $this->_exportContext($view);
+            if ($file != null) $action = $file;
+            if (is_null($action)) $action = $this->action;
+            if ($layout === null) $layout = $this->layout;
 
-            /* Inherit with given the layout */
-            if ($layout && $this->autoLayout)
-                $view->inherit($this->_getLayoutFileName($layout));
+            /* Render view with ginven action name */
+            if ($action !== false && $viewFileName = $this->_getViewFileName($action)) {
 
-            /* Render the view */
-            $this->output = $this->renderer->render($view);
+                /* Create a view object for action */
+                $view = new Opt_View($viewFileName);
+                $this->_exportContext($view);
 
-            $this->hasRendered = true;
-            return $this->output;
-        } else {
-            throw new Opt_TemplateNotFound_Exception;
+                /* Inherit with given the layout */
+                if ($layout)
+                    $view->inherit($this->_getLayoutFileName($layout));
+
+                /* Render the view */
+                $this->output = $this->renderer->render($view);
+
+                $this->hasRendered = true;
+                return $this->output;
+            } else {
+                throw new Opc_NoActionGiven_Exception;
+            }
+        } catch(Opt_Exception $e){
+            Opt_Error_Handler($e);
         }
-    }
 
-    /*
-     * Render the layout
-     *
-     * To embed content of a view write:
-     *
-     *      <opt:include view="$content" />
-    */
-    function renderLayout($content, $viewName, $layout = null) {
-        $layoutFileName = 
-
-        /* Create view object for layout */
-        $layout = new Opt_View($layoutFileName);
-        $layout->content = $content;
-        $layout->pageTitle = $this->pageTitle;
-        $layout->viewTemplateName = $viewName;
-        
-        $this->_exportContext($layout);
-
-        /* Render the layout */
-        return $this->renderer->render($layout);
     }
 
     /* Returns file name for view */
@@ -159,7 +146,6 @@ class Opc_View extends Object {
 
     /* Creates filename for view or layout */
     function _getFileName($name, $default, $directory = null) {
-
         /* Set subdir if available */
         $subDir = null;
         if (!is_null($this->subDir)) $subDir = $this->subDir . DS;
