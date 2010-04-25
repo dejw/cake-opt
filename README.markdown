@@ -66,7 +66,7 @@ Open Power Cake uses template inheritance to render views. See [this section][OP
 
 ### Helpers ###
 
-Thanks OPT's extensibility Open Power Cake introduces some extra instructions, which adds some flavour to Your Cake.
+Thanks to OPT's extensibility Open Power Cake introduces some extra instructions, which adds some flavour to Your Cake.
 
 #### opt:link_to ####
 
