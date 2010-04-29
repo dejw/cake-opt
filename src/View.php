@@ -75,7 +75,6 @@ class OpenPowerTemplateView extends Object {
      *
      * Used configuration variables:
      *   Opt.compileDir  -- directory to place compiled template (relative to APP/views)
-     *   Opt.contentType -- output format of a template (default is "Opt_Output_Http::HTML")
      *   Opt.charser     -- charset of templates (default is "utf-8")
      */
     private static function initialize(){
@@ -92,7 +91,6 @@ class OpenPowerTemplateView extends Object {
 
         self::$_opt->sourceDir = ROOT . DS . APP_DIR . DS . 'views' . DS;
         self::$_opt->compileDir = ROOT. DS . APP_DIR . DS . $compileDir . DS;
-        eval('self::$_opt->contentType = ' . def(Configure::read("Opt.contentType"), "Opt_Output_Http::HTML") . ';');
         self::$_opt->charset = def(Configure::read("Opt.charset"), 'utf-8');
         
         /* Recompile template every request on debug */
