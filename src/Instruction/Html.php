@@ -3,8 +3,8 @@
 /*
  * Set ot html helper instructions. Includes:
  *
- * opt:link_to -- uses internal CakePHP's Router to form an anchor
- * opt:url     -- renders only the url
+ * cake:link_to -- uses internal CakePHP's Router to form an anchor
+ * cake:url     -- renders only the url
  * 
  * @author: Dawid Fatyga
  */
@@ -13,7 +13,7 @@ class Opc_Instruction_Html extends Opt_Compiler_Processor {
 
     /* Configures the instruction */
     public function configure(){
-        $this->_addInstructions(array('opt:link_to', 'opt:url'));
+        $this->_addInstructions(array('cake:link_to', 'cake:url'));
     }
     
     /*

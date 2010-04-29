@@ -17,7 +17,8 @@ try {
 
     /* TODO: This should be done automatically */
     $tpl->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
-
+    $tpl->register(Opt_Class::OPT_NAMESPACE, "cake");
+    
     $tpl->setup();
 } catch(Opt_Exception $exception) {
     Opt_Error_Handler($exception);
