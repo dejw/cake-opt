@@ -1,33 +1,6 @@
 <?php
 
-try {
-    $tpl = new Opt_Class;
-
-    /* TODO: make this configurable */
-    $tpl->sourceDir = ROOT . DS . APP_DIR .  '/views/';
-    $tpl->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
-    $tpl->contentType = Opt_Output_Http::HTML;
-    $tpl->charset = 'utf-8';
-    
-    /* Recompile template every request on debug */
-    if(Configure::read() > 0){
-        $tpl->compileMode = Opt_Class::CM_REBUILD;
-        Opl_Registry::setState('opl_extended_errors', true);
-    }
-
-    /* TODO: This should be done automatically */
-    $tpl->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
-    $tpl->register(Opt_Class::OPT_NAMESPACE, "cake");
-    
-    $tpl->setup();
-} catch(Opt_Exception $exception) {
-    Opt_Error_Handler($exception);
-}
-
-class Opc_NoActionGiven_Exception extends Opt_API_Exception
-{
-    protected $_message = 'no action was given to rendering process.';
-} // end Opt_TemplateNotFound_Exception;
+require "Exception.php";
 
 /*
  * View class for Open Power Template library
@@ -35,6 +8,16 @@ class Opc_NoActionGiven_Exception extends Opt_API_Exception
 */
 
 class Opc_View extends Object {
+
+    /*
+     * @var: Opt_Class
+     */
+    static private $_opt = null;
+    
+    /*
+     * @var: Opt_Output_Return
+     */
+    static private $_renderer = null;
 
     /* Name of the controller. */
     var $controller = null;
@@ -77,16 +60,46 @@ class Opc_View extends Object {
 
     /* List of variables to collect from the associated controller */
     var $__passedVars = array(
-            'viewVars', 'action', 'autoLayout', 'autoRender',
-            'here', 'layout', 'name', 'pageTitle', 'viewPath',
-            'params', 'data', 'passedArgs',
+        'viewVars', 'action', 'autoLayout', 'autoRender',
+        'here', 'layout', 'name', 'pageTitle', 'viewPath',
+        'params', 'data', 'passedArgs',
     );
 
-    /* This Output class simply returns template */
-    var $renderer = null;
+    /*
+     * Initializes the Open Power Template library
+     */
+    private static function initialize(){
+        if(is_object(self::$_opt)) return;
+        
+        if(Opl_Registry::exists('opt'))
+            self::$_opt = Opl_Registry::get('opt');
+        else
+            self::$_opt = new Opt_Class;
+
+        /* TODO: make this configurable */
+        self::$_opt->sourceDir = ROOT . DS . APP_DIR .  '/views/';
+        self::$_opt->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
+        self::$_opt->contentType = Opt_Output_Http::HTML;
+        self::$_opt->charset = 'utf-8';
+
+        self::$_opt->register(Opt_Class::OPT_NAMESPACE, "cake");
+        /* Recompile template every request on debug */
+        if(Configure::read() > 0){
+            self::$_opt->compileMode = Opt_Class::CM_REBUILD;
+            Opl_Registry::setState('opl_extended_errors', true);
+        }
+
+        /* TODO: This should be done automatically */
+        self::$_opt->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
+        self::$_opt->setup();
+
+        self::$_renderer = new Opt_Output_Return();
+    }
 
     /* Standard view configuration */
     function __construct(&$controller, $register = true) {
+        self::initialize();
+        
         if (is_object($controller)) {
             foreach($this->__passedVars as $var)
                 $this->{$var} = $controller->{$var};
@@ -98,7 +111,6 @@ class Opc_View extends Object {
         parent::__construct();
 
         if ($register) ClassRegistry::addObject('view', $this);
-        $this->renderer = new Opt_Output_Return();
     }
 
     /* Renders the single action */
@@ -122,7 +134,7 @@ class Opc_View extends Object {
                     $view->inherit($this->_getLayoutFileName($layout));
 
                 /* Render the view */
-                $this->output = $this->renderer->render($view);
+                $this->output = self::$_renderer->render($view);
 
                 $this->hasRendered = true;
                 return $this->output;
