@@ -7,7 +7,7 @@ require "Exception.php";
  * @author: Dawdid Fatyga
 */
 
-class Opc_View extends Object {
+class OpenPowerTemplateView extends Object {
 
     /*
      * @var: Opt_Class
@@ -90,7 +90,7 @@ class Opc_View extends Object {
         }
 
         /* TODO: This should be done automatically */
-        self::$_opt->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Opc_Instruction_Html');
+        self::$_opt->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Cake_Instruction_Html');
         self::$_opt->setup();
 
         self::$_renderer = new Opt_Output_Return();
@@ -122,7 +122,7 @@ class Opc_View extends Object {
             if (is_null($action)) $action = $this->action;
             if ($layout === null) $layout = $this->layout;
 
-            /* Render view with ginven action name */
+            /* Render view with given action name */
             if ($action !== false && $viewFileName = $this->_getViewFileName($action)) {
 
                 /* Create a view object for action */

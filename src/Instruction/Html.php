@@ -8,7 +8,7 @@
  * 
  * @author: Dawid Fatyga
  */
-class Opc_Instruction_Html extends Opt_Compiler_Processor {
+class Cake_Instruction_Html extends Opt_Compiler_Processor {
     protected $_name = 'html';
 
     /* Configures the instruction */
