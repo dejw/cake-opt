@@ -41,19 +41,19 @@ To make the new View class visible in Your application paste the line below at t
 Now You can use brand new Open Power Cake view the same as standard views in CakePHP. E.g. write:
 
     class AppController extends Controller {
-        var $view = "Opc_";
+        var $view = "OpenPowerTemplate";
         // ... rest of the code
     }
 
-To enable Open Power Template in whole application. `Opc_` class behaves exactly the same as standard view classes so it can be turned on per-controller or per-action by writing:
+To enable Open Power Template in whole application. `OpenPowerTemplate` class behaves exactly the same as standard view classes so it can be turned on per-controller or per-action by writing:
 
     class MyController extends AppController {
         /* OPT will render templates for MyController */
-        var $view = "Opc_";
+        var $view = "OpenPowerTemplate";
 
         /* OPT will render templates only for someAction in MyController */
         function someAction(){
-            $this->view = "Opc_";
+            $this->view = "OpenPowerTemplate";
         }
     }
 
@@ -99,11 +99,10 @@ Open Power Cake is compatible with CakePHp 1.2.2.8120 and Open Power Template 2.
 
 List below includes features that certainly will be implemented in the future:
 
-1. Configurable plugin parameters
-2. Extended `set()` and `get()` methods to handle Object Types from OPT
-3. Helpers (for html, ajax etc.)
-4. Compatibility test against older CakePHP and OPT versions.
-5. Alter not only view class, but also whole rendering system
+1. Extended `set()` and `get()` methods to handle Object Types from OPT
+2. Helpers (for html, ajax etc.)
+3. Compatibility test against older CakePHP and OPT versions.
+4. Alter not only view class, but also whole rendering system
 
   [CakePHP]: http://cakephp.org/  "CakePHP"
   [CakePHPdownload]: http://github.com/cakephp/cakephp1x/downloads "CakePHP: downloads"

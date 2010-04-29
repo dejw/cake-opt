@@ -2,6 +2,11 @@
 
 require "Exception.php";
 
+function def($value, $default){
+    if($value !== null) return $value;
+    return $default;
+}
+
 /*
  * View class for Open Power Template library
  * @author: Dawdid Fatyga
@@ -67,6 +72,11 @@ class OpenPowerTemplateView extends Object {
 
     /*
      * Initializes the Open Power Template library
+     *
+     * Used configuration variables:
+     *   Opt.compileDir  -- directory to place compiled template (relative to APP/views)
+     *   Opt.contentType -- output format of a template (default is "Opt_Output_Http::HTML")
+     *   Opt.charser     -- charset of templates (default is "utf-8")
      */
     private static function initialize(){
         if(is_object(self::$_opt)) return;
@@ -76,21 +86,25 @@ class OpenPowerTemplateView extends Object {
         else
             self::$_opt = new Opt_Class;
 
-        /* TODO: make this configurable */
-        self::$_opt->sourceDir = ROOT . DS . APP_DIR .  '/views/';
-        self::$_opt->compileDir = ROOT. DS . APP_DIR .'/views/compiled/';
-        self::$_opt->contentType = Opt_Output_Http::HTML;
-        self::$_opt->charset = 'utf-8';
+        /* configure compile path */
+        $compileDir = def(Configure::read("Opt.compileDir"), 'views'. DS . 'compiled');
+        $compileDir = trim($compileDir, "/\\");
 
-        self::$_opt->register(Opt_Class::OPT_NAMESPACE, "cake");
+        self::$_opt->sourceDir = ROOT . DS . APP_DIR . DS . 'views' . DS;
+        self::$_opt->compileDir = ROOT. DS . APP_DIR . DS . $compileDir . DS;
+        eval('self::$_opt->contentType = ' . def(Configure::read("Opt.contentType"), "Opt_Output_Http::HTML") . ';');
+        self::$_opt->charset = def(Configure::read("Opt.charset"), 'utf-8');
+        
         /* Recompile template every request on debug */
         if(Configure::read() > 0){
             self::$_opt->compileMode = Opt_Class::CM_REBUILD;
             Opl_Registry::setState('opl_extended_errors', true);
         }
 
-        /* TODO: This should be done automatically */
+        /* Register instructions */
+        self::$_opt->register(Opt_Class::OPT_NAMESPACE, "cake");
         self::$_opt->register(Opt_Class::OPT_INSTRUCTION, 'Html', 'Cake_Instruction_Html');
+
         self::$_opt->setup();
 
         self::$_renderer = new Opt_Output_Return();
